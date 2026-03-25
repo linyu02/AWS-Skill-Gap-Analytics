@@ -2,13 +2,13 @@
 
 Turn messy job postings into clear learning priorities.
 
-![Demo](. /data analysis/weekly_skill_demand.gif)
+![Demo](./data%20analysis/weekly_skill_demand.gif)
 
 ---
 
 ## Why I Built This
 
-Job descriptions made me feel like I needed to learn *everything*.
+Job descriptions often made me feel like I needed to learn *everything* while market demand kept changing.
 
 So I reframed the problem:
 
@@ -23,27 +23,23 @@ So I reframed the problem:
 
 ![Top Skills](./assets/top_skills.png)
 
-* Python and SQL dominate consistently
-* Machine Learning is necessary but not sufficient
-* Cloud (AWS) appears frequently but is underrepresented in my profile
-
-![Coverage](./assets/coverage.png)
-
-* ~65% of required skills matched
-* ~35% identified as high-impact gaps
+* A small set of skills appeared consistently across many roles
+* About 30% of the top skills were soft skills
+* Communication showed up in about 90% of job descriptions
 
 ---
-
-
 
 ## How It Works
 
 S3 → Lambda → Step Functions → DynamoDB → S3
 
-* Extract skills using LLM (Amazon Bedrock)
-* Aggregate demand across jobs
-* Compare with resume
-* Output gaps and next steps
+1. Upload weekly job descriptions and my resume to S3
+2. Prevent duplicate weekly runs
+3. Extract and normalize skills with Bedrock
+4. Retrieve top weekly skills
+5. Compare market demand against my resume
+6. Request human review
+7. Write final recommendations
 
 ![Architecture](./assets/architecture.png)
 
@@ -54,27 +50,28 @@ S3 → Lambda → Step Functions → DynamoDB → S3
 ## Repo Guide
 
 * `lambda/`
-  Core AWS Lambda functions:
+  Core AWS Lambda functions for:
 
-  * skill extraction (LLM)
-  * aggregation (weekly counts)
-  * resume comparison (match vs gap)
-  * recommendation generation
+  * skill extraction
+  * top skill retrieval
+  * resume comparison
+  * human review request
+  * final recommendation writing
 
 * `step_functions/`
-  Workflow definition for orchestrating the pipeline
+  Workflow definition for pipeline orchestration
 
-* `scripts/`
-  Local analysis and visualization (charts, GIFs)
+* `data analysis/`
+  Local analysis and visualization files, including charts and GIFs
 
 * `assets/`
-  Visualizations and architecture diagram used above
+  README visuals and architecture diagram
 
 * `sample_output/`
-  Example outputs (matched skills, gaps, recommendations)
+  Example outputs such as matched skills, gaps, and recommendations
 
 ---
 
 ## Stack
 
-Python · AWS (S3, Lambda, Step Functions, DynamoDB) · Bedrock · Pandas
+Python · AWS (S3, Lambda, Step Functions, DynamoDB, SNS, IAM) · Bedrock · Pandas
