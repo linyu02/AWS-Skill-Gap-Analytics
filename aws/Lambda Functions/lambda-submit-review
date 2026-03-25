@@ -1,0 +1,239 @@
+import os
+import json
+from datetime import datetime, timezone
+
+import boto3
+from botocore.config import Config
+
+CFG = Config(
+    connect_timeout=5,
+    read_timeout=10,
+    retries={"max_attempts": 2, "mode": "standard"}
+)
+
+dynamodb = boto3.resource("dynamodb", config=CFG)
+sfn = boto3.client("stepfunctions", config=CFG)
+
+table = dynamodb.Table(os.environ["REVIEW_TABLE"])
+
+
+def response(status_code: int, body: dict):
+    return {
+        "statusCode": status_code,
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps(body)
+    }
+
+
+def normalize_skill(skill: str) -> str:
+    return str(skill or "").strip().lower()
+
+
+def validate_revised_payload(payload: dict) -> list[str]:
+    errors = []
+
+    if not isinstance(payload, dict):
+        return ["revised_payload must be an object"]
+
+    matched_skills = payload.get("matched_skills")
+    gap_skills = payload.get("gap_skills")
+
+    if not isinstance(matched_skills, list):
+        errors.append("matched_skills must be a list")
+        matched_skills = []
+
+    if not isinstance(gap_skills, list):
+        errors.append("gap_skills must be a list")
+        gap_skills = []
+
+    matched_seen = set()
+    gap_seen = set()
+
+    for idx, item in enumerate(matched_skills):
+        if not isinstance(item, dict):
+            errors.append(f"matched_skills[{idx}] must be an object")
+            continue
+
+        skill = normalize_skill(item.get("skill"))
+        evidence = str(item.get("evidence") or "").strip()
+
+        if not skill:
+            errors.append(f"matched_skills[{idx}].skill is required")
+        if not evidence:
+            errors.append(f"matched_skills[{idx}].evidence is required")
+
+        if skill:
+            if skill in matched_seen:
+                errors.append(f"Duplicate matched skill: {skill}")
+            matched_seen.add(skill)
+
+        if item.get("match") is not True:
+            errors.append(f"matched_skills[{idx}].match must be true")
+
+    for idx, item in enumerate(gap_skills):
+        if not isinstance(item, dict):
+            errors.append(f"gap_skills[{idx}] must be an object")
+            continue
+
+        skill = normalize_skill(item.get("skill"))
+
+        if not skill:
+            errors.append(f"gap_skills[{idx}].skill is required")
+
+        if skill:
+            if skill in gap_seen:
+                errors.append(f"Duplicate gap skill: {skill}")
+            gap_seen.add(skill)
+
+        if item.get("match") is not False:
+            errors.append(f"gap_skills[{idx}].match must be false")
+
+    overlap = matched_seen.intersection(gap_seen)
+    if overlap:
+        errors.append(f"Skills cannot exist in both matched_skills and gap_skills: {sorted(overlap)}")
+
+    return errors
+
+
+def lambda_handler(event, context):
+    """
+    API Gateway HTTP API event:
+    POST /reviews/{review_id}/submit
+
+    Expected body:
+    {
+      "approved": true,
+      "revised_payload": {
+        "week": "2026-W03",
+        "run_utc": "...",
+        "resume_key": "...",
+        "top_skills": [...],
+        "matched_skills": [...],
+        "gap_skills": [...],
+        "overlap_count": 1,
+        "gap_count": 2
+      }
+    }
+    """
+    path_params = event.get("pathParameters") or {}
+    review_id = path_params.get("review_id")
+    if not review_id:
+        return response(400, {"message": "Missing path parameter: review_id"})
+
+    raw_body = event.get("body") or "{}"
+
+    try:
+        body = json.loads(raw_body)
+    except json.JSONDecodeError:
+        return response(400, {"message": "Request body must be valid JSON"})
+
+    approved = body.get("approved")
+    revised_payload = body.get("revised_payload")
+
+    if approved is None:
+        return response(400, {"message": "Missing required field: approved"})
+    if approved not in [True, False]:
+        return response(400, {"message": "approved must be true or false"})
+
+    resp = table.get_item(Key={"review_id": review_id})
+    item = resp.get("Item")
+
+    if not item:
+        return response(404, {"message": "Review not found"})
+
+    current_status = item.get("status")
+    if current_status in ("APPROVED", "REJECTED"):
+        return response(409, {"message": f"Review already finalized with status {current_status}"})
+
+    task_token = item.get("task_token")
+    if not task_token:
+        return response(500, {"message": "Stored review is missing task_token"})
+
+    now = datetime.now(timezone.utc).isoformat()
+
+    if approved:
+        if not isinstance(revised_payload, dict):
+            return response(400, {"message": "revised_payload is required when approved=true"})
+
+        validation_errors = validate_revised_payload(revised_payload)
+        if validation_errors:
+            return response(400, {
+                "message": "Validation failed",
+                "errors": validation_errors
+            })
+
+        # recalculate counts to avoid trusting client values
+        matched_skills = revised_payload.get("matched_skills", [])
+        gap_skills = revised_payload.get("gap_skills", [])
+
+        final_output = {
+            **revised_payload,
+            "review_id": review_id,
+            "approved": True,
+            "review_status": "APPROVED",
+            "overlap_count": len(matched_skills),
+            "gap_count": len(gap_skills)
+        }
+
+        sfn.send_task_success(
+            taskToken=task_token,
+            output=json.dumps(final_output)
+        )
+
+        table.update_item(
+            Key={"review_id": review_id},
+            UpdateExpression="""
+                SET #s = :s,
+                    reviewed_payload = :rp,
+                    approved = :a,
+                    updated_at = :u
+            """,
+            ExpressionAttributeNames={
+                "#s": "status"
+            },
+            ExpressionAttributeValues={
+                ":s": "APPROVED",
+                ":rp": final_output,
+                ":a": True,
+                ":u": now
+            }
+        )
+
+        return response(200, {
+            "ok": True,
+            "review_id": review_id,
+            "status": "APPROVED"
+        })
+
+    # rejected path
+    sfn.send_task_failure(
+        taskToken=task_token,
+        error="HumanRejected",
+        cause="Reviewer rejected the comparison result"
+    )
+
+    table.update_item(
+        Key={"review_id": review_id},
+        UpdateExpression="""
+            SET #s = :s,
+                approved = :a,
+                updated_at = :u
+        """,
+        ExpressionAttributeNames={
+            "#s": "status"
+        },
+        ExpressionAttributeValues={
+            ":s": "REJECTED",
+            ":a": False,
+            ":u": now
+        }
+    )
+
+    return response(200, {
+        "ok": True,
+        "review_id": review_id,
+        "status": "REJECTED"
+    })
