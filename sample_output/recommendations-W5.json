@@ -1,0 +1,276 @@
+{
+  "week": "2026-W5-v1",
+  "generated_at": "2026-03-15T01:58:49.430841+00:00",
+  "jobs_processed": 9,
+  "review_status": "APPROVED",
+  "approved": true,
+  "review_id": "d2392cb7-a75f-491f-92b0-b505fd15e8a5",
+  "run_utc": "2026-03-15T01:57:12.063889+00:00",
+  "resume_key": "resume_LY_Jan_12/Resume_03_10.txt",
+  "top_skills": [
+    {
+      "category": "soft",
+      "skill": "communication",
+      "job_count": 9
+    },
+    {
+      "category": "technical",
+      "skill": "sql",
+      "job_count": 9
+    },
+    {
+      "category": "technical",
+      "skill": "python",
+      "job_count": 6
+    },
+    {
+      "category": "soft",
+      "skill": "analytical thinking",
+      "job_count": 4
+    },
+    {
+      "category": "technical",
+      "skill": "data modeling",
+      "job_count": 4
+    },
+    {
+      "category": "soft",
+      "skill": "problem solving",
+      "job_count": 4
+    },
+    {
+      "category": "technical",
+      "skill": "snowflake",
+      "job_count": 4
+    },
+    {
+      "category": "technical",
+      "skill": "tableau",
+      "job_count": 4
+    },
+    {
+      "category": "technical",
+      "skill": "a/b testing",
+      "job_count": 3
+    },
+    {
+      "category": "soft",
+      "skill": "adaptability",
+      "job_count": 3
+    },
+    {
+      "category": "soft",
+      "skill": "collaboration",
+      "job_count": 3
+    },
+    {
+      "category": "technical",
+      "skill": "dbt",
+      "job_count": 3
+    },
+    {
+      "category": "technical",
+      "skill": "r",
+      "job_count": 3
+    },
+    {
+      "category": "soft",
+      "skill": "stakeholder management",
+      "job_count": 3
+    },
+    {
+      "category": "technical",
+      "skill": "analytics",
+      "job_count": 2
+    },
+    {
+      "category": "soft",
+      "skill": "attention to detail",
+      "job_count": 2
+    },
+    {
+      "category": "technical",
+      "skill": "aws",
+      "job_count": 2
+    },
+    {
+      "category": "technical",
+      "skill": "cohort analysis",
+      "job_count": 2
+    },
+    {
+      "category": "technical",
+      "skill": "etl",
+      "job_count": 2
+    },
+    {
+      "category": "technical",
+      "skill": "excel",
+      "job_count": 2
+    }
+  ],
+  "matched_skills": [
+    {
+      "skill": "communication",
+      "job_count": 9,
+      "category": "soft",
+      "match": true,
+      "evidence": "Stakeholder Communication & Visualization"
+    },
+    {
+      "skill": "sql",
+      "job_count": 9,
+      "category": "technical",
+      "match": true,
+      "evidence": "Python (Pandas) and SQL"
+    },
+    {
+      "skill": "python",
+      "job_count": 6,
+      "category": "technical",
+      "match": true,
+      "evidence": "Python (Pandas) and SQL"
+    },
+    {
+      "skill": "analytical thinking",
+      "job_count": 4,
+      "category": "soft",
+      "match": true,
+      "evidence": "Designed a standardized evaluation framework"
+    },
+    {
+      "skill": "data modeling",
+      "job_count": 4,
+      "category": "technical",
+      "match": true,
+      "evidence": "Bayesian Modeling"
+    },
+    {
+      "skill": "tableau",
+      "job_count": 4,
+      "category": "technical",
+      "match": true,
+      "evidence": "interactive Tableau dashboards"
+    },
+    {
+      "skill": "a/b testing",
+      "job_count": 3,
+      "category": "technical",
+      "match": true,
+      "evidence": "run end-to-end A/B experiments"
+    },
+    {
+      "skill": "problem solving",
+      "job_count": 4,
+      "category": "soft",
+      "match": true,
+      "evidence": "Designed a standardized evaluation framework"
+    },
+    {
+      "skill": "collaboration",
+      "job_count": 3,
+      "category": "soft",
+      "match": true,
+      "evidence": "Collaborated with 10+ clinicians and regulators"
+    },
+    {
+      "skill": "stakeholder management",
+      "job_count": 3,
+      "category": "soft",
+      "match": true,
+      "evidence": "Collaborated with 10+ clinicians and regulators"
+    },
+    {
+      "skill": "analytics",
+      "job_count": 2,
+      "category": "technical",
+      "match": true,
+      "evidence": "Data Analytics: Collected, cleaned, and analyzed 5M+ scheduling records"
+    },
+    {
+      "skill": "attention to detail",
+      "job_count": 2,
+      "category": "soft",
+      "match": true,
+      "evidence": "Engineered and validated a dataset"
+    },
+    {
+      "skill": "etl",
+      "job_count": 2,
+      "category": "technical",
+      "match": true,
+      "evidence": "Designed and deployed a serverless AWS ETL pipeline"
+    },
+    {
+      "skill": "excel",
+      "job_count": 2,
+      "category": "technical",
+      "match": true,
+      "evidence": "Excel (Pivot Tables, advanced functions, VBA)"
+    },
+    {
+      "skill": "r",
+      "job_count": 3,
+      "category": "technical",
+      "match": true,
+      "evidence": "Engineered and validated a dataset of 4000 scenarios in Python/R"
+    },
+    {
+      "skill": "aws",
+      "job_count": 2,
+      "category": "technical",
+      "match": true,
+      "evidence": "Designed and deployed a serverless AWS ETL pipeline"
+    }
+  ],
+  "gap_skills": [
+    {
+      "skill": "snowflake",
+      "job_count": 4,
+      "category": "technical",
+      "match": false
+    },
+    {
+      "skill": "dbt",
+      "job_count": 3,
+      "category": "technical",
+      "match": false
+    },
+    {
+      "skill": "cohort analysis",
+      "job_count": 2,
+      "category": "technical",
+      "match": false
+    },
+    {
+      "skill": "adaptability",
+      "job_count": 3,
+      "category": "soft",
+      "match": false
+    }
+  ],
+  "overlap_count": 16,
+  "gap_count": 4,
+  "recommendations": [
+    {
+      "skill": "snowflake",
+      "explanation": "Snowflake is a popular cloud data platform used by many companies for data storage and analytics.",
+      "first_step": "Sign up for a free Snowflake trial account and complete the introductory tutorials."
+    },
+    {
+      "skill": "dbt",
+      "explanation": "dbt (data build tool) is a popular tool for data transformation and modeling in the analytics engineering workflow.",
+      "first_step": "Read the official dbt documentation and set up a sample dbt project on your local machine."
+    },
+    {
+      "skill": "cohort analysis",
+      "explanation": "Cohort analysis is a technique used to analyze user behavior and retention over time.",
+      "first_step": "Read an introductory article or watch a video tutorial on cohort analysis and its applications."
+    },
+    {
+      "skill": "adaptability",
+      "explanation": "Adaptability is a crucial soft skill for data scientists to navigate changing requirements and technologies.",
+      "first_step": "Reflect on a recent situation where you had to adapt to a change and write down how you approached it."
+    }
+  ]
+}
